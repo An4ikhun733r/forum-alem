@@ -27,7 +27,7 @@ func (s *service) Authenticate(username, password string) (*models.Session, int,
 	userId, err := s.repo.Authenticate(username, password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
-			return nil, 0, models.ErrNotValidPostForm
+			return nil, 0, models.ErrInvalidCredentials
 		} else {
 			return nil, 0, err
 		}

@@ -37,7 +37,7 @@ func (s *Sqlite) InsertSnippet(title, content, category string, user_id int) (in
 func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
 	// Write the SQL statement we want to execute. Again, I've split it over two
 	// lines for readability.
-	stmt := `SELECT id, user_id, title, content, likes, dislikes, created FROM snippets
+	stmt := `SELECT id, user_id, title, content, likes, dislikes, category, created FROM snippets
     WHERE id = ?`
 
 	// Use the QueryRow() method on the connection pool to execute our
@@ -54,7 +54,7 @@ func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
 	// to row.Scan are *pointers* to the place you want to copy the data into,
 	// and the number of arguments must be exactly the same as the number of
 	// columns returned by your statement.
-	err := row.Scan(&ss.ID, &ss.Title, &ss.Content, &ss.Created, &ss.Category)
+	err := row.Scan(&ss.ID, &ss.User_id, &ss.Title, &ss.Content, &ss.Likes, &ss.Dislikes, &ss.Category,&ss.Created)
 	if err != nil {
 		// If the query returns no rows, then row.Scan() will return a
 		// sql.ErrNoRows error. We use the errors.Is() function check for that
@@ -73,7 +73,7 @@ func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
 
 func (s *Sqlite) Latest() ([]*models.Snippet, error) {
 	// Write the SQL statement we want to execute.
-	stmt := `SELECT id, user_id, title, content, likes, dislikes, created FROM snippets ORDER BY id DESC LIMIT 10`
+	stmt := `SELECT id, user_id, title, content, likes, dislikes, category, created FROM snippets ORDER BY id DESC LIMIT 10`
 
 	// Use the Query() method on the connection pool to execute our
 	// SQL statement. This returns a sql.Rows resultset containing the result of
@@ -106,7 +106,7 @@ func (s *Sqlite) Latest() ([]*models.Snippet, error) {
 		// must be pointers to the place you want to copy the data into, and the
 		// number of arguments must be exactly the same as the number of
 		// columns returned by your statement.
-		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Category)
+		err = rows.Scan(&s.ID, &s.User_id, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Category, &s.Created)
 		if err != nil {
 			return nil, err
 		}
