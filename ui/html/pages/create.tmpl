@@ -4,37 +4,36 @@
 <form action='/snippet/create/post' method='POST'>
     <div>
         <label>Title:</label>
-        <!-- Use the `with` action to render the value of .Form.FieldErrors.title
-        if it is not empty. -->
         {{with .Form.FieldErrors.title}}
             <label class='error'>{{.}}</label>
         {{end}}
-        <!-- Re-populate the title data by setting the `value` attribute. -->
         <input type='text' name='title' value='{{.Form.Title}}'>
     </div>
     <div>
         <label>Content:</label>
-        <!-- Likewise render the value of .Form.FieldErrors.content if it is not
-        empty. -->
         {{with .Form.FieldErrors.content}}
             <label class='error'>{{.}}</label>
         {{end}}
-        <!-- Re-populate the content data as the inner HTML of the textarea. -->
         <textarea name='content'>{{.Form.Content}}</textarea>
     </div>
     <div>
-        <label>Category</label>
-        <!-- And render the value of .Form.FieldErrors.expires if it is not empty. -->
+        <label>Select Categories</label>
         {{with .Form.FieldErrors.category}}
             <label class='error'>{{.}}</label>
         {{end}}
-        <!-- Here we use the `if` action to check if the value of the re-populated
-        expires field equals 365. If it does, then we render the `checked`
-        attribute so that the radio input is re-selected. -->
-        <input type='radio' name='category' value='games' {{if (eq .Form.Category "games")}}checked{{end}}> Games
-        <!-- And we do the same for the other possible values too... -->
-        <input type='radio' name='category' value='Memes' {{if (eq .Form.Category "Memes")}}checked{{end}}> Memes
-        <input type='radio' name='category' value='Life' {{if (eq .Form.Category "Life")}}checked{{end}}> Life
+        {{/* Loop through the Categories slice and check if "Games" is selected */}}
+        <input type='checkbox' name='category' value='Games' 
+            {{range .Form.Category}} 
+                {{if eq . "Games"}}checked{{end}}
+            {{end}}> Games
+        <input type='checkbox' name='category' value='Memes' 
+            {{range .Form.Category}} 
+                {{if eq . "Memes"}}checked{{end}}
+            {{end}}> Memes
+        <input type='checkbox' name='category' value='Life' 
+            {{range .Form.Category}} 
+                {{if eq . "Life"}}checked{{end}}
+            {{end}}> Life
     </div>
     <div>
         <input type='submit' value='Publish snippet'>

@@ -1,24 +1,45 @@
 {{define "title"}}Home{{end}}
-
 {{define "main"}}
-    <h2>Latest Snippets</h2>
+    <h2>Categories</h2>
+    <form action="/" method="get" class="filter-form">
+        <label><input type="checkbox" name="tag" value="Games">Games</label>
+        <label><input type="checkbox" name="tag" value="Memes">Memes</label>
+        <label><input type="checkbox" name="tag" value="Life">Life</label>
+        <button type="submit">Filter</button>
+    </form>
+
+    <h2>Latest Posts</h2>
     {{if .Snippets}}
-     <table>
-        <tr>
-            <th>Title</th>
-            <th>Created</th>
-            <th>ID</th>
-        </tr>
-        {{range .Snippets}}
-        <tr>
-            <!-- Use the new clean URL style-->
-            <td><a href='/snippet/view/{{.ID}}'>{{.Title}}</a></td>
-            <td>{{humanDate .Created}}</td>
-            <td>#{{.ID}}</td>
-        </tr>
-        {{end}}
-    </table>
+        <div class="post-list">
+            {{range .Snippets}}
+                <div class="post">
+                    <h3><a href="/snippet/view/{{.ID}}">{{.Title}}</a></h3>
+                    <p>
+                        {{if gt (len .Content) 50}}
+                            {{slice .Content 0 50}}...
+                        {{else}}
+                            {{.Content}}
+                        {{end}}
+                    </p>
+                    <div class="metadata">
+                        <span>Created: {{humanDate .Created}}</span>
+                        <div class="likes-dislikes">
+                            <form action="/snippet/like" method="post" class="like-form">
+                                <input type="hidden" name="postID" value="{{.ID}}">
+                                <button type="submit" class="like-button">Like</button>
+                                <span class="like-count">{{.Likes}}</span>
+                            </form>
+                            <form action="/snippet/dislike" method="post" class="dislike-form">
+                                <input type="hidden" name="postID" value="{{.ID}}">
+                                <button type="submit" class="dislike-button">Dislike</button>
+                                <span class="dislike-count">{{.Dislikes}}</span>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {{end}}
+        </div>
     {{else}}
-        <p>There's nothing to see here... yet!</p>
+        <p class="empty-message">There's nothing to see here... yet!</p>
     {{end}}
 {{end}}

@@ -64,7 +64,7 @@ func (app *Application) Render(w http.ResponseWriter, status int, page string, d
 
 func (app *Application) NewTemplateData(r *http.Request) *models.TemplateData {
 	return &models.TemplateData{
-		CurrentYear: time.Now().Year(),
+		IsAuthenticated: false,
+		CurrentYear:     time.Now().Year(),
 	}
 }
-

@@ -3,6 +3,7 @@ package service
 import (
 	"forum/internal/models"
 	"forum/internal/sqlite"
+	"net/http"
 )
 
 type service struct {
@@ -19,13 +20,18 @@ func NewService(repo sqlite.RepoI) ServiceI {
 }
 
 type SnippetRepo interface {
-	InsertSnippet(cookie, title, content, category string) (int, error)
+	InsertSnippet(cookie, title, content string, category []string) (int, error)
 	GetSnippet(id int) (*models.Snippet, error)
-	Latest() ([]*models.Snippet, error)
+	Latest(tags []string) ([]*models.Snippet, error)
+	DislikePost(userID, postID int) error
+	LikePost(userID, postID int) error
+	AddComment(postId, userId int, content string) error
+	GetCommentByPostId(postId int) ([]models.Comment, error)
 }
 
 type UserRepo interface {
 	InsertUser(username, password, email string) (int, error)
 	Authenticate(username, password string) (*models.Session, int, error)
+	DeleteSession(token string) error
+	GetUser(r *http.Request) (*models.User, error)
 }
-

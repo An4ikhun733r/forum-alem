@@ -6,26 +6,29 @@ import (
 	"forum/internal/app"
 	"forum/internal/models"
 	"forum/internal/validator" //"html/template"
+	"log"
 	"net/http"
 	"strconv" // New import
 	// New import
-)	
+)
 
 func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		h.NotFound(w)
 		return
 	}
+	
+	selectedTags := r.URL.Query()["tag"]
 
-	snippets, err := h.service.Latest()
+	snippets, err := h.service.Latest(selectedTags)
 	if err != nil {
 		h.ServerError(w, err)
 		return
 	}
 
 	data := h.NewTemplateData(r)
+	data.IsAuthenticated = h.IsAuthenticated(r)
 	data.Snippets = snippets
-
 	h.Render(w, http.StatusOK, "home.tmpl", data)
 }
 
@@ -45,16 +48,23 @@ func (h *HandlerApp) SnippetView(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	comments, err := h.service.GetCommentByPostId(id)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
 
 	data := h.NewTemplateData(r)
+	data.IsAuthenticated = h.IsAuthenticated(r)
 	data.Snippet = snippet
+	data.Comments = &comments
 
 	h.Render(w, http.StatusOK, "view.tmpl", data)
 }
 
 func (h *HandlerApp) SnippetCreate(w http.ResponseWriter, r *http.Request) {
 	data := h.NewTemplateData(r)
-
+	data.IsAuthenticated = h.IsAuthenticated(r)
 	data.Form = models.SnippetCreateForm{}
 
 	h.Render(w, http.StatusOK, "create.tmpl", data)
@@ -68,9 +78,9 @@ func (h *HandlerApp) SnippetCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := models.SnippetCreateForm{
-		Title:   r.PostForm.Get("title"),
-		Content: r.PostForm.Get("content"),
-		Category: r.PostForm.Get("category"),
+		Title:    r.PostForm.Get("title"),
+		Content:  r.PostForm.Get("content"),
+		Category: r.PostForm["category"],
 	}
 
 	form.CheckField(validator.NotBlank(form.Title), "title", "This field cannot be blank")
@@ -133,7 +143,6 @@ func (h *HandlerApp) UserSignupPost(w http.ResponseWriter, r *http.Request) {
 			data.Form = form
 			h.Render(w, http.StatusUnprocessableEntity, "signup.tmpl", data)
 		} else {
-			
 			h.ServerError(w, err)
 		}
 		return
@@ -157,7 +166,7 @@ func (h *HandlerApp) UserLoginPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form := models.UserLoginForm{
-		Name: r.PostForm.Get("name"),
+		Name:     r.PostForm.Get("name"),
 		Password: r.PostForm.Get("password"),
 	}
 
@@ -185,6 +194,95 @@ func (h *HandlerApp) UserLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := h.NewTemplateData(r)
+	data.IsAuthenticated = true
 	app.SetSessionCookie("session_id", w, session.Token, session.ExpTime)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) UserLogout(w http.ResponseWriter, r *http.Request) {
+	c := app.GetSessionCookie("session_id", r)
+	if c != nil {
+		h.service.DeleteSession(c.Value)
+		app.ExpireSessionCookie("session_id", w)
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) LikePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		log.Println(err)
+		h.NotFound(w)
+		return
+	}
+
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	err = h.service.LikePost(userID.ID, postID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) DislikePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	postIDStr := r.FormValue("postID")
+	postID, err := strconv.Atoi(postIDStr)
+	if err != nil || postID < 1 {
+		log.Println(err)
+		h.NotFound(w)
+		return
+	}
+
+	userID, err := h.service.GetUser(r)
+	if err != nil {
+		h.ServerError(w, err)
+	}
+
+	err = h.service.DislikePost(userID.ID, postID)
+	if err != nil {
+		h.ServerError(w, err)
+		return
+	}
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (h *HandlerApp) AddComment(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		postIDStr := r.FormValue("PostId")
+		postID, err := strconv.Atoi(postIDStr)
+		if err != nil || postID < 1 {
+			h.NotFound(w)
+			return
+		}
+		userID, err := h.service.GetUser(r)
+		content := r.FormValue("Content")
+		if err != nil {
+			h.ServerError(w, err)
+			return
+		}
+		err = h.service.AddComment(postID, userID.ID, content)
+		if err != nil {
+			http.Error(w, "Unable to add comment", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, fmt.Sprintf("/snippet/view/%d", postID), http.StatusSeeOther)
+	}
 }

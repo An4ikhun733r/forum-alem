@@ -15,6 +15,16 @@ func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
 	return userID, nil
 }
 
+func (s *Sqlite) GetUserNameByUserID(user_id int) (string, error) {
+	stmt := `SELECT name FROM users WHERE id = ?`
+	var name string
+	err := s.DB.QueryRow(stmt, user_id).Scan(&name)
+	if err != nil {
+		return "This user don't have name", err
+	}
+	return name, nil
+}
+
 func (s *Sqlite) CreateSession(session *models.Session) error {
 	op := "sqlite.CreateSession"
 	stmt := `INSERT INTO sessions(user_id, token, exp_time) VALUES(?, ?, ?)`

@@ -13,12 +13,19 @@ type RepoI interface {
 }
 
 type PostRepo interface {
-	InsertSnippet(title, content, category string, user_id int) (int, error)
+	InsertSnippet(name, title, content string, category []string, user_id int) (int, error)
 	GetSnippet(id int) (*models.Snippet, error)
-	Latest() ([]*models.Snippet, error)
+	Latest(tags []string) ([]*models.Snippet, error)
+	AddComment(postId, userId int, content string) error
+	GetCommentByPostId(postId int) ([]models.Comment, error)
+	GetUserReaction(userID, postID int) (int, error)
+	LikePost(userID, postID int) error
+	DislikePost(userID, postID int) error
+	RemoveReaction(userID, postID int) error
 }
 
 type SessionRepo interface {
+	GetUserNameByUserID(user_id int) (string, error)
 	GetUserIDByToken(token string) (int, error)
 	CreateSession(session *models.Session) error
 	DeleteSessionById(userid int) error

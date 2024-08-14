@@ -1,17 +1,46 @@
-{{define "title"}}Snippet #{{.Snippet.ID}}{{end}}
-
+{{define "title"}}Post #{{.Snippet.ID}}{{end}}
 {{define "main"}}
     {{with .Snippet}}
     <div class='snippet'>
         <div class='metadata'>
             <strong>{{.Title}}</strong>
-            <span>#{{.ID}}</span>
         </div>
         <pre><code>{{.Content}}</code></pre>
         <div class='metadata'>
-            <!-- Use the new template function here -->
+            Author: {{.Name}}
+        </div>
+        <div class='metadata'>
             <time>Created: {{humanDate .Created}}</time>
+        </div>
+        <div class='metadata'>
+            Categories: 
+            {{if .Category}}
+                {{range .Category}}
+                    {{.}}
+                {{end}}
+            {{else}}
+                <span>No categories</span>
+            {{end}}
         </div>
     </div>
     {{end}}
+
+    <h2>Comments</h2>
+    {{if .Comments}}
+        {{range .Comments}}
+        <div class="comment">
+            <p>{{.Content}}</p>
+            <small>Posted by user {{.Username}} at {{humanDate .Created}}</small>
+        </div>
+        {{else}}
+        <p>No comments yet.</p>
+        {{end}}
+    {{end}}
+    
+    <h3>Add a Comment</h3>
+    <form action="/snippet/comment" method="post">
+        <input type="hidden" name="PostId" value="{{.Snippet.ID}}">
+        <textarea name="Content" required></textarea>
+        <button type="submit">Add Comment</button>
+    </form>
 {{end}}

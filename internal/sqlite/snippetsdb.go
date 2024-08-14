@@ -5,22 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"forum/internal/models"
+	"strings"
 )
 
 type SnippetModel struct {
 	DB *sql.DB
 }
 
-func (s *Sqlite) InsertSnippet(title, content, category string, user_id int) (int, error) {
+func (s *Sqlite) InsertSnippet(name, title, content string, category []string, user_id int) (int, error) {
+	categoryStr := strings.Join(category, ", ")
 	// SQLite uses different syntax for inserting current time and date calculations.
-	stmt := `INSERT INTO snippets (user_id, title, content, category, created)
-    VALUES (?, ?, ?, ?, datetime('now'))`
-	fmt.Println(title)
-	fmt.Println(content)
-	fmt.Println(user_id)
-	fmt.Println(category)
+	stmt := `INSERT INTO snippets (user_id, name, title, content, category, created)
+    VALUES (?, ?, ?, ?, ?, datetime('now'))`
+
 	// Execute the statement using Exec() method.
-	result, err := s.DB.Exec(stmt, user_id, title, content, category)
+	result, err := s.DB.Exec(stmt, user_id, name, title, content, categoryStr)
 	if err != nil {
 		return 0, err
 	}
@@ -35,10 +34,9 @@ func (s *Sqlite) InsertSnippet(title, content, category string, user_id int) (in
 }
 
 func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
-	// Write the SQL statement we want to execute. Again, I've split it over two
-	// lines for readability.
-	stmt := `SELECT id, user_id, title, content, likes, dislikes, category, created FROM snippets
-    WHERE id = ?`
+	// Write the SQL statement we want to execute.
+	stmt := `SELECT id, user_id, name, title, content, likes, dislikes, category, created FROM snippets
+        WHERE id = ?`
 
 	// Use the QueryRow() method on the connection pool to execute our
 	// SQL statement, passing in the untrusted id variable as the value for the
@@ -48,80 +46,180 @@ func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
 
 	// Initialize a pointer to a new zeroed Snippet struct.
 	ss := &models.Snippet{}
+	var categoryStr string
 
 	// Use row.Scan() to copy the values from each field in sql.Row to the
-	// corresponding field in the Snippet struct. Notice that the arguments
-	// to row.Scan are *pointers* to the place you want to copy the data into,
-	// and the number of arguments must be exactly the same as the number of
-	// columns returned by your statement.
-	err := row.Scan(&ss.ID, &ss.User_id, &ss.Title, &ss.Content, &ss.Likes, &ss.Dislikes, &ss.Category,&ss.Created)
+	// corresponding field in the Snippet struct.
+	err := row.Scan(&ss.ID, &ss.User_id, &ss.Name, &ss.Title, &ss.Content, &ss.Likes, &ss.Dislikes, &categoryStr, &ss.Created)
 	if err != nil {
-		// If the query returns no rows, then row.Scan() will return a
-		// sql.ErrNoRows error. We use the errors.Is() function check for that
-		// error specifically, and return our own ErrNoRecord error
-		// instead (we'll create this in a moment).
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRecord
-		} else {
-			return nil, err
 		}
+		return nil, err
 	}
+
+	// Convert the comma-separated string to a slice of strings.
+	ss.Category = strings.Split(categoryStr, ",")
 
 	// If everything went OK then return the Snippet object.
 	return ss, nil
 }
 
-func (s *Sqlite) Latest() ([]*models.Snippet, error) {
-	// Write the SQL statement we want to execute.
-	stmt := `SELECT id, user_id, title, content, likes, dislikes, category, created FROM snippets ORDER BY id DESC LIMIT 10`
+func (s *Sqlite) Latest(tags []string) ([]*models.Snippet, error) {
+	// Base SQL statement
+	stmt := `SELECT id, user_id, name, title, content, likes, dislikes, category, created 
+             FROM snippets 
+             WHERE 1=1`
+	
+	// Add tag filters to the SQL statement if there are tags
+	if len(tags) > 0 {
+		stmt += ` AND (`
+		for i, _ := range tags {
+			if i > 0 {
+				stmt += ` OR `
+			}
+			stmt += `category LIKE ?`
+		}
+		stmt += `)`
+	}
 
-	// Use the Query() method on the connection pool to execute our
-	// SQL statement. This returns a sql.Rows resultset containing the result of
-	// our query.
-	rows, err := s.DB.Query(stmt)
+	// Add ordering and limit
+	stmt += ` ORDER BY id DESC LIMIT 10`
+
+	// Prepare arguments for the query
+	args := []interface{}{}
+	for _, tag := range tags {
+		args = append(args, "%"+tag+"%") // Use LIKE to match tags
+	}
+
+	// Execute the query
+	rows, err := s.DB.Query(stmt, args...)
 	if err != nil {
 		return nil, err
 	}
-
-	// We defer rows.Close() to ensure the sql.Rows resultset is
-	// always properly closed before the Latest() method returns. This defer
-	// statement should come *after* you check for an error from the Query()
-	// method. Otherwise, if Query() returns an error, you'll get a panic
-	// trying to close a nil resultset.
 	defer rows.Close()
 
-	// Initialize an empty slice to hold the Snippet structs.
+	// Initialize an empty slice to hold the Snippet structs
 	snippets := []*models.Snippet{}
 
-	// Use rows.Next to iterate through the rows in the resultset. This
-	// prepares the first (and then each subsequent) row to be acted on by the
-	// rows.Scan() method. If iteration over all the rows completes then the
-	// resultset automatically closes itself and frees-up the underlying
-	// database connection.
+	// Iterate through the rows
 	for rows.Next() {
-		// Create a pointer to a new zeroed Snippet struct.
 		s := &models.Snippet{}
-		// Use rows.Scan() to copy the values from each field in the row to the
-		// new Snippet object that we created. Again, the arguments to row.Scan()
-		// must be pointers to the place you want to copy the data into, and the
-		// number of arguments must be exactly the same as the number of
-		// columns returned by your statement.
-		err = rows.Scan(&s.ID, &s.User_id, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &s.Category, &s.Created)
+		var categoryStr string
+
+		// Scan row values
+		err = rows.Scan(&s.ID, &s.User_id, &s.Name, &s.Title, &s.Content, &s.Likes, &s.Dislikes, &categoryStr, &s.Created)
 		if err != nil {
 			return nil, err
 		}
-		// Append it to the slice of snippets.
+
+		// Convert category string to slice of strings
+		s.Category = strings.Split(categoryStr, ",")
+
+		// Append the snippet to the slice
 		snippets = append(snippets, s)
 	}
 
-	// When the rows.Next() loop has finished we call rows.Err() to retrieve any
-	// error that was encountered during the iteration. It's important to
-	// call this - don't assume that a successful iteration was completed
-	// over the whole resultset.
+	// Check for errors encountered during iteration
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	// If everything went OK then return the Snippets slice.
+	// Return the slice of snippets
 	return snippets, nil
+}
+
+
+func (s *Sqlite) AddComment(postId, userId int, content string) error {
+	op := "sqlite.AddComment"
+	stmt, err := s.DB.Prepare("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)")
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = stmt.Exec(postId, userId, content)
+	if  err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Sqlite) GetCommentByPostId(postId int) ([]models.Comment, error) {
+	op := "sqlite.GetCommentByPostId"
+
+	query := `
+        SELECT c.id, c.post_id, c.user_id, u.name, c.content, c.created_at
+        FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.post_id = ?
+    `
+	rows, err := s.DB.Query(query, postId)
+	if err != nil {
+		return nil, fmt.Errorf("%s : %w", op, err)
+	}
+	defer rows.Close()
+	var comments []models.Comment
+	for rows.Next() {
+		var comment models.Comment
+		err := rows.Scan(&comment.ID, &comment.PostId, &comment.UserId, &comment.Username, &comment.Content, &comment.Created)
+		if err != nil {
+			return nil, fmt.Errorf("%s : %w", op, err)
+		}
+		comments = append(comments, comment)
+	}
+	return comments, nil
+}
+
+func (s *Sqlite) GetUserReaction(userID, postID int) (int, error) {
+	op := "sqlite.GetUserReaction"
+	var reaction int
+	err := s.DB.QueryRow(`SELECT reaction FROM user_post_reactions WHERE user_id = ? AND post_id = ?`, userID, postID).Scan(&reaction)
+	if err != nil {
+		return 0, fmt.Errorf("%s : %w", op, err)
+	}
+	return reaction, nil
+}
+
+func (s *Sqlite) LikePost(userID, postID int) error {
+	op := "sqlite.LikePost"
+	_, err := s.DB.Exec(`INSERT INTO user_post_reactions (user_id, post_id, reaction) VALUES (?, ?, 1)`, userID, postID)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`UPDATE snippets SET likes = likes + 1 WHERE id = ?`, postID)
+	return err
+}
+
+func (s *Sqlite) DislikePost(userID, postID int) error {
+	op := "sqlite.DislikePost"
+	_, err := s.DB.Exec(`INSERT INTO user_post_reactions (user_id, post_id, reaction) VALUES (?, ?, -1)`, userID, postID)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`UPDATE snippets SET dislikes = dislikes + 1 WHERE id = ?`, postID)
+	return err
+}
+
+func (s *Sqlite) RemoveReaction(userID, postID int) error {
+	op := "sqlite.RemoveReaction"
+	var reaction int
+	err := s.DB.QueryRow(`SELECT reaction FROM user_post_reactions WHERE user_id = ? AND post_id = ?`, userID, postID).Scan(&reaction)
+	if err != nil {
+		return fmt.Errorf("%s : %w", op, err)
+	}
+	_, err = s.DB.Exec(`DELETE FROM user_post_reactions WHERE user_id = ? AND post_id = ?`, userID, postID)
+	if err != nil {
+		return err
+	}
+	if reaction == 1 {
+		_, err = s.DB.Exec(`UPDATE snippets SET likes = likes - 1 WHERE id = ?`, postID)
+		if err != nil {
+			return err
+		}
+	} else {
+		_, err = s.DB.Exec(`UPDATE snippets SET dislikes = dislikes - 1 WHERE id = ?`, postID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

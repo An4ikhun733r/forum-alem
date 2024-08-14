@@ -10,7 +10,7 @@ func (h *HandlerApp) Routes() http.Handler {
 
 	mux.HandleFunc("/", h.Home)
 	
-	mux.HandleFunc("/snippet/view/", h.RequireAuth(h.SnippetView))
+	mux.HandleFunc("/snippet/view/", h.SnippetView)
 	mux.HandleFunc("/snippet/create", h.RequireAuth(h.SnippetCreate))
 	mux.HandleFunc("/snippet/create/post", h.RequireAuth(h.SnippetCreatePost))
 
@@ -18,6 +18,11 @@ func (h *HandlerApp) Routes() http.Handler {
 	mux.HandleFunc("/user/signup/post", h.UserSignupPost)
 	mux.HandleFunc("/user/login", h.UserLogin)
 	mux.HandleFunc("/user/login/post", h.UserLoginPost)
+	mux.HandleFunc("/user/logout", h.UserLogout)
+
+	mux.HandleFunc("/snippet/like", h.RequireAuth(h.LikePost))
+	mux.HandleFunc("/snippet/dislike", h.RequireAuth(h.DislikePost))
+	mux.HandleFunc("/snippet/comment", h.RequireAuth(h.AddComment))
 
 	// Wrap the existing chain with the recoverPanic middleware.
 	return h.recoverPanic(h.logRequest(secureHeaders(mux)))

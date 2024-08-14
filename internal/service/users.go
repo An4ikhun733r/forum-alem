@@ -51,3 +51,10 @@ func (s *service) GetUser(r *http.Request) (*models.User, error) {
 	}
 	return s.repo.GetUserByID(userID)
 }
+
+func (s *service) DeleteSession(token string) error {
+	if err := s.repo.DeleteSessionByToken(token); err != nil {
+		return err
+	}
+	return nil
+}
