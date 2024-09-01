@@ -1,28 +1,31 @@
 {{define "title"}}Log In{{end}}
 
 {{define "main"}}
-<form action='/user/login/post' method='POST'>
-    <div>
-        <label>Username:</label>
-        {{with .Form.FieldErrors.username}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='text' name='name' value='{{.Form.Name}}'>
-    </div>
-    <div>
-        <label>Password:</label>
-        {{with .Form.FieldErrors.password}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='password' name='password' value='{{.Form.Password}}'>
-    </div>
-    <div>
-        {{with .Form.FieldErrors.generic}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-    </div>
-    <div>
-        <input type='submit' value='Log In'>
-    </div>
-</form>
+<div class="auth-container">
+    <h2>Log In</h2>
+    <form action='/user/login/post' method='POST' class="auth-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            {{with .Form.FieldErrors.username}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' id="username" name='name' value='{{.Form.Name}}'>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            {{with .Form.FieldErrors.password}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='password' id="password" name='password' value='{{.Form.Password}}'>
+        </div>
+        <div class="form-group">
+            {{with .Form.FieldErrors.generic}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+        </div>
+        <div class="form-group">
+            <input type='submit' value='Log In' class="submit-button">
+        </div>
+    </form>
+</div>
 {{end}}

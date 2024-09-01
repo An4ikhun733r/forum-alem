@@ -1,400 +1,662 @@
-/* Reset default browser styles */
-html, body {
+/* Общие настройки */
+body {
+  background-color: #0a0a0a;
+  color: #dcdcdc;
+  font-family: 'Courier New', Courier, monospace;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
 }
-/* Global styles */
-body {
-  background-color: #f0f0f0;
-  padding: 20px;
+
+h2, h3 {
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  text-shadow: 0 0 10px #00ff00;
 }
-h2 {
-  color: #333;
-}
-.post-list {
-  margin: 20px auto; /* Центрируем блок по горизонтали и добавляем отступы сверху и снизу */
-  max-width: 800px; /* Максимальная ширина блока, чтобы содержимое не было слишком широким на больших экранах */
-}
-.post {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 20px;
-}
-.post h3 {
-  margin-top: 0;
-}
-.post p {
-  margin-bottom: 10px;
-}
-.post .metadata {
-  color: #888;
-  font-size: 0.9em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.post-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.post-table th, .post-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-.post-table th {
-  background-color: #f0f0f0;
-  color: #333;
-}
-.post-table td {
-  vertical-align: middle;
-}
-.post-table td a {
-  color: #007bff;
+
+a {
+  color: #00ff00;
   text-decoration: none;
 }
-.post-table td a:hover {
-  text-decoration: underline;
+
+a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00cc00;
 }
+
+/* Главная контейнерная секция */
+.main-container {
+  width: 80%;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  border-radius: 10px;
+}
+/* Категории и фильтры */
+.categories-section {
+  background-color: #121212;
+  padding: 15px;
+  margin-bottom: 30px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.categories-section h2 {
+  margin-bottom: 15px;
+  text-align: center; /* Центровка заголовка */
+}
+
+.filter-form {
+  display: flex;
+  justify-content: center; /* Выравнивание по центру */
+  align-items: center;
+  gap: 20px; /* Отступ между чекбоксами */
+}
+
+.filter-form label {
+  color: #00ff00;
+  display: flex; /* Для лучшего позиционирования чекбоксов */
+  align-items: center;
+  margin-bottom: 0;
+  gap: 10px; /* Отступ между чекбоксом и текстом */
+}
+
+.filter-form input[type="checkbox"] {
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #1a1a1a;
+  border: 1px solid #00ff00;
+  cursor: pointer;
+  accent-color: #00ff00;
+}
+
+/* Стили кнопок оставляем прежними */
+button[type="submit"] {
+  background-color: #333;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button[type="submit"]:hover {
+  background-color: #1a1a1a;
+}
+
+/* Дополнительные фильтры */
+.additional-filters {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Отступ между кнопками */
+  margin-top: 20px; /* Отступ сверху от фильтров */
+}
+
+.filter-button-form button {
+  background-color: #333;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.filter-button-form button:hover {
+  background-color: #1a1a1a;
+}
+
+/* Посты */
+.latest-posts-section {
+  background-color: #121212;
+  padding: 15px;
+  border: 1px solid #333;
+  border-radius: 10px;
+}
+
+.post {
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.post:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+.metadata {
+  font-size: 0.8em;
+  color: #888;
+}
+
 .likes-dislikes {
   display: flex;
   align-items: center;
+  margin-top: 10px;
 }
+
 .like-form, .dislike-form {
-  display: flex;
-  align-items: center;
-  margin-right: 10px;
+  display: inline-block;
+  margin-right: 20px;
 }
+
 .like-button, .dislike-button {
-  background-color: #007bff;
-  color: #fff;
+  background-color: transparent;
   border: none;
-  border-radius: 4px;
-  padding: 5px 10px;
+  color: #00ff00;
   cursor: pointer;
+  padding: 3px 8px; /* Уменьшил размеры кнопок */
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em; /* Уменьшил размер шрифта */
 }
+
 .like-button:hover, .dislike-button:hover {
-  background-color: #0056b3;
+  color: #00cc00;
 }
+
 .like-count, .dislike-count {
-  margin-left: 5px;
-  font-weight: bold;
+  color: #00ff00;
+  margin-left: 8px; /* Чуть уменьшил отступ */
 }
-/* Account details styles */
-/* Styles for Your Account section */
-.account-details {
-  max-width: 600px; /* Максимальная ширина контейнера для улучшенного визуального восприятия */
-  margin: 20px auto; /* Центрирование блока по центру и добавление отступов */
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+.empty-message {
+  color: #888;
+  text-align: center;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .main-container {
+      width: 100%;
+      padding: 10px;
+  }
+
+  .post {
+      padding: 15px;
+  }
+}
+/* Header Styling */
+.main-header {
+  background-color: #121212;
   padding: 20px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+  border-bottom: 2px solid #00ff00;
+  position: relative;
 }
-.account-details h2 {
-  margin-top: 0;
-  color: #333;
+
+.main-header h1 {
+  margin: 0;
+  font-size: 2em;
+  color: #00ff00;
+  text-shadow: 0 0 0 #00ff00;
+  animation: neonFadeIn 2s ease-in-out forwards;
 }
-.account-details table {
-  width: 100%;
-  border-collapse: collapse; /* Склеиваем границы ячеек таблицы */
-  margin-bottom: 15px;
+
+.main-header h1 a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
-.account-details th,
-.account-details td {
+
+.main-header h1 a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00cc00;
+}
+
+/* Keyframes for neon effect animation */
+@keyframes neonFadeIn {
+  0% {
+      text-shadow: 0 0 0 #00ff00;
+  }
+  50% {
+      text-shadow: 0 0 10px #00ff00;
+  }
+  100% {
+      text-shadow: 0 0 15px #00ff00, 0 0 20px #00ff00, 0 0 25px #00ff00;
+  }
+}
+/* Navigation Styling */
+.main-nav {
+  background-color: #121212;
+  padding: 10px 0;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  border-bottom: 2px solid #00ff00;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex; /* Включаем flexbox для горизонтального размещения */
+  justify-content: center; /* Выравниваем по центру */
+  flex-wrap: nowrap; /* Убираем перенос строк */
+}
+
+.nav-links li {
+  margin: 0 20px; /* Отступы между элементами */
+  display: inline; /* Убеждаемся, что элементы списка отображаются как inline */
+}
+
+.nav-links a {
+  color: #00ff00;
+  text-decoration: none;
   padding: 10px;
-  border-bottom: 1px solid #ddd; /* Горизонтальная линия под ячейками */
+  transition: color 0.3s ease, text-shadow 0.3s ease;
 }
-.account-details th {
-  text-align: left;
-  color: #007bff; /* Цвет заголовков столбцов */
+
+.nav-links a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00cc00;
 }
-.account-details a {
-  color: #007bff;
+
+
+/* Подвал */
+.main-footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #121212;
+  color: #dcdcdc;
+  border-top: 1px solid #333;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+.main-footer a {
+  color: #00ff00;
   text-decoration: none;
 }
-.account-details a:hover {
-  text-decoration: underline;
+
+.main-footer a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00cc00;
 }
-.account-details td {
-  color: #555; /* Цвет текста в ячейках */
-}
-.account-table {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-.account-table th, .account-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-.account-table th {
-  background-color: #f0f0f0;
-  color: #333;
-}
-.account-table td {
-  vertical-align: middle;
-}
-.account-table td a {
-  color: #007bff;
-  text-decoration: none;
-}
-.account-table td a:hover {
-  text-decoration: underline;
-}
-/* Create a New Post form styles */
-.new-post-form {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+/* Auth Container */
+.auth-container {
+  width: 80%;
+  max-width: 400px;
+  margin: 50px auto;
   padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  text-align: center;
 }
-.new-post-form label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
+
+/* Form Styling */
+.auth-form {
+  display: flex;
+  flex-direction: column;
 }
-.new-post-form input[type='text'],
-.new-post-form textarea {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-.new-post-form .error {
-  color: #dc3545;
-  font-size: 0.9em;
-}
-.new-post-form input[type='radio'] {
-  margin-right: 8px;
-}
-.new-post-form input[type='submit'] {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.new-post-form input[type='submit']:hover {
-  background-color: #0056b3;
-}
-/* Login form styles */
-.login-form {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-.login-form label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-.login-form input[type='email'],
-.login-form input[type='password'] {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-.login-form .error {
-  color: #dc3545;
-  font-size: 0.9em;
-}
-.login-form input[type='submit'] {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.login-form input[type='submit']:hover {
-  background-color: #0056b3;
-}
-/* Signup form styles */
-.signup-form {
-  margin-top: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-}
-.signup-form label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-}
-.signup-form input[type='text'],
-.signup-form input[type='email'],
-.signup-form input[type='password'] {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-.signup-form .error {
-  color: #dc3545;
-  font-size: 0.9em;
-}
-.signup-form input[type='submit'] {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.signup-form input[type='submit']:hover {
-  background-color: #0056b3;
-}
-/* Post details styles */
-.post-details {
-  margin-top: 20px;
-}
-.post-details .snippet {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+
+.form-group {
   margin-bottom: 20px;
 }
-.post-details .snippet .metadata {
-  margin-bottom: 10px;
-}
-.post-details .snippet .metadata strong {
-  font-size: 1.2em;
-  color: #333;
-}
-.post-details .snippet .metadata span {
-  margin-left: 10px;
-  color: #888;
-}
-.post-details .snippet pre code {
+
+.form-group label {
   display: block;
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-  overflow-x: auto;
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-}
-.post-details .snippet .metadata time {
-  margin-right: 10px;
-  color: #555;
-}
-.post-details .comments {
-  margin-top: 20px;
-}
-.post-details .comments .comment {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-}
-.post-details .comments .comment p {
+  color: #00ff00;
   margin-bottom: 5px;
 }
-.post-details .comments .comment small {
-  color: #777;
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #dcdcdc;
 }
-.post-details .add-comment-form {
+
+.form-group input[type="text"]::placeholder,
+.form-group input[type="password"]::placeholder {
+  color: #888;
+}
+
+.form-group .error {
+  color: #ff0000;
+  font-size: 0.9em;
+}
+
+.submit-button {
+  background-color: #00ff00;
+  color: #0a0a0a;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #00cc00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Snippet Container */
+.snippet-container {
+  width: 80%;
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  text-align: center;
+}
+
+/* Form Styling */
+.snippet-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  color: #00ff00;
+  margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #dcdcdc;
+}
+
+.form-group textarea {
+  height: 150px;
+  resize: vertical;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group textarea::placeholder {
+  color: #888;
+}
+
+.form-group .error {
+  color: #ff0000;
+  font-size: 0.9em;
+}
+
+.category-options {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}
+
+.category-options label {
+  color: #00ff00;
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.category-options input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.submit-button {
+  background-color: #00ff00;
+  color: #0a0a0a;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #00cc00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Sign Up Container */
+.signup-container {
+  width: 80%;
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  text-align: center;
+}
+
+/* Form Styling */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  color: #00ff00;
+  margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #dcdcdc;
+}
+
+.form-group input[type="text"]::placeholder,
+.form-group input[type="password"]::placeholder,
+.form-group input[type="email"]::placeholder {
+  color: #888;
+}
+
+.form-group .error {
+  color: #ff0000;
+  font-size: 0.9em;
+}
+
+.submit-button {
+  background-color: #00ff00;
+  color: #0a0a0a;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #00cc00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Error Page Container */
+.error-container {
+  width: 80%;
+  max-width: 600px;
+  margin: 100px auto;
+  padding: 30px;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+}
+
+/* Error Title */
+.error-container h1 {
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 2.5em;
+  text-shadow: 0 0 10px #00ff00;
+  margin-bottom: 20px;
+}
+
+/* Error Message */
+.error-container p {
+  color: #dcdcdc;
+  font-size: 1.2em;
+  margin-bottom: 30px;
+}
+
+/* Home Link */
+.home-link {
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  text-decoration: none;
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border: 2px solid #00ff00;
+  border-radius: 5px;
+  background-color: #0a0a0a;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.home-link:hover {
+  color: #0a0a0a;
+  background-color: #00ff00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+/* Централизованный контейнер */
+.centered-container {
+  width: 80%;
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Стиль для самого сниппета */
+.snippet {
+  padding: 20px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 10px;
+  margin-bottom: 30px;
+}
+
+.snippet .metadata {
+  color: #00ff00;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.snippet pre {
+  background-color: #1a1a1a;
+  color: #dcdcdc;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Стиль для категории */
+.snippet .metadata span {
+  color: #888;
+  font-size: 0.9em;
+}
+
+.snippet .metadata time {
+  color: #888;
+  font-size: 0.9em;
+}
+
+/* Комментарии */
+.comment {
+  background-color: #121212;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #333;
+}
+
+.comment p {
+  color: #dcdcdc;
+  margin: 0 0 10px;
+}
+
+.comment small {
+  color: #888;
+  font-size: 0.8em;
+}
+
+/* Добавление комментария */
+.comment-form {
   margin-top: 20px;
 }
-.post-details .add-comment-form textarea {
+
+.comment-form textarea {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 10px;
+  background-color: #121212;
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: #dcdcdc;
+  margin-bottom: 15px;
+  resize: vertical;
+  min-height: 100px;
 }
-.post-details .add-comment-form button {
-  background-color: #007bff;
-  color: #fff;
+
+.comment-form textarea::placeholder {
+  color: #888;
+}
+
+.comment-form button {
+  background-color: #00ff00;
+  color: #0a0a0a;
   border: none;
   padding: 10px 20px;
-  border-radius: 4px;
   cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
-.post-details .add-comment-form button:hover {
-  background-color: #0056b3;
+
+.comment-form button:hover {
+  background-color: #00cc00;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
 }
-/* Navigation styles */
-nav {
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
+
+/* Заголовки комментариев */
+h2, h3 {
+  color: #00ff00;
+  font-family: 'Courier New', Courier, monospace;
+  text-shadow: 0 0 10px #00ff00;
 }
-nav a {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 15px;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-nav a:hover {
-  background-color: #0056b3;
-}
-nav form {
-  margin: 0;
-}
-nav button {
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-nav button:hover {
-  background-color: #c82333;
-}
-/* Base styles */
-body {
-  font-family: 'Ubuntu Mono', monospace;
-  line-height: 1.6;
-  margin: 0;
-  padding: 0;
-  background-color: #f8f9fa;
-}
-header {
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  text-align: center;
-}
-header h1 a {
-  color: #fff;
+
+/* Общий стиль ссылок */
+a {
+  color: #00ff00;
   text-decoration: none;
 }
-main {
-  padding: 20px;
-}
-footer {
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-}
-footer a {
-  color: #fff;
-  text-decoration: none;
-}
-footer a:hover {
-  text-decoration: underline;
+
+a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00cc00;
 }

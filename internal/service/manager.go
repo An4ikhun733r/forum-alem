@@ -22,7 +22,7 @@ func NewService(repo sqlite.RepoI) ServiceI {
 type SnippetRepo interface {
 	InsertSnippet(cookie, title, content string, category []string) (int, error)
 	GetSnippet(id int) (*models.Snippet, error)
-	Latest(tags []string) ([]*models.Snippet, error)
+	Latest(tags []string, filter string, userID int) ([]*models.Snippet, error)
 	DislikePost(userID, postID int) error
 	LikePost(userID, postID int) error
 	AddComment(postId, userId int, content string) error

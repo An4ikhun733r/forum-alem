@@ -1,42 +1,46 @@
 {{define "title"}}Create a New Snippet{{end}}
 
 {{define "main"}}
-<form action='/snippet/create/post' method='POST'>
-    <div>
-        <label>Title:</label>
-        {{with .Form.FieldErrors.title}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <input type='text' name='title' value='{{.Form.Title}}'>
-    </div>
-    <div>
-        <label>Content:</label>
-        {{with .Form.FieldErrors.content}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        <textarea name='content'>{{.Form.Content}}</textarea>
-    </div>
-    <div>
-        <label>Select Categories</label>
-        {{with .Form.FieldErrors.category}}
-            <label class='error'>{{.}}</label>
-        {{end}}
-        {{/* Loop through the Categories slice and check if "Games" is selected */}}
-        <input type='checkbox' name='category' value='Games' 
-            {{range .Form.Category}} 
-                {{if eq . "Games"}}checked{{end}}
-            {{end}}> Games
-        <input type='checkbox' name='category' value='Memes' 
-            {{range .Form.Category}} 
-                {{if eq . "Memes"}}checked{{end}}
-            {{end}}> Memes
-        <input type='checkbox' name='category' value='Life' 
-            {{range .Form.Category}} 
-                {{if eq . "Life"}}checked{{end}}
-            {{end}}> Life
-    </div>
-    <div>
-        <input type='submit' value='Publish snippet'>
-    </div>
-</form>
+<div class="snippet-container">
+    <h2>Create a New Snippet</h2>
+    <form action='/snippet/create/post' method='POST' class="snippet-form">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            {{with .Form.FieldErrors.title}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <input type='text' id="title" name='title' value='{{.Form.Title}}'>
+        </div>
+        <div class="form-group">
+            <label for="content">Content:</label>
+            {{with .Form.FieldErrors.content}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <textarea id="content" name='content'>{{.Form.Content}}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Select Categories</label>
+            {{with .Form.FieldErrors.category}}
+                <label class='error'>{{.}}</label>
+            {{end}}
+            <div class="category-options">
+                <label><input type='checkbox' name='category' value='Games'
+                    {{range .Form.Category}}
+                        {{if eq . "Games"}}checked{{end}}
+                    {{end}}> Games</label>
+                <label><input type='checkbox' name='category' value='Memes'
+                    {{range .Form.Category}}
+                        {{if eq . "Memes"}}checked{{end}}
+                    {{end}}> Memes</label>
+                <label><input type='checkbox' name='category' value='Life'
+                    {{range .Form.Category}}
+                        {{if eq . "Life"}}checked{{end}}
+                    {{end}}> Life</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type='submit' value='Publish Snippet' class="submit-button">
+        </div>
+    </form>
+</div>
 {{end}}

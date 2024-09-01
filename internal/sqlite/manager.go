@@ -15,7 +15,7 @@ type RepoI interface {
 type PostRepo interface {
 	InsertSnippet(name, title, content string, category []string, user_id int) (int, error)
 	GetSnippet(id int) (*models.Snippet, error)
-	Latest(tags []string) ([]*models.Snippet, error)
+	Latest(tags []string, filter string, userID int) ([]*models.Snippet, error)
 	AddComment(postId, userId int, content string) error
 	GetCommentByPostId(postId int) ([]models.Comment, error)
 	GetUserReaction(userID, postID int) (int, error)

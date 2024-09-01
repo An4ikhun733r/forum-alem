@@ -65,12 +65,30 @@ func (s *Sqlite) GetSnippet(id int) (*models.Snippet, error) {
 	return ss, nil
 }
 
-func (s *Sqlite) Latest(tags []string) ([]*models.Snippet, error) {
+func (s *Sqlite) Latest(tags []string, filter string, userID int) ([]*models.Snippet, error) {
 	// Base SQL statement
 	stmt := `SELECT id, user_id, name, title, content, likes, dislikes, category, created 
              FROM snippets 
              WHERE 1=1`
-	
+
+	// Prepare arguments for the query
+	args := []interface{}{}
+
+	// Handle the 'liked' filter separately
+	if filter == "liked" {
+		likedStmt := `SELECT s.id 
+                      FROM snippets s
+                      JOIN user_post_reactions ul ON s.id = ul.post_id
+                      WHERE ul.user_id = ? AND ul.reaction > 0`
+		args = append(args, userID)
+
+		// Modify the main statement to use the results of the liked filter
+		stmt += ` AND id IN (` + likedStmt + `)`
+	} else if filter == "myPosts" {
+		stmt += ` AND user_id = ?`
+		args = append(args, userID)
+	}
+
 	// Add tag filters to the SQL statement if there are tags
 	if len(tags) > 0 {
 		stmt += ` AND (`
@@ -79,18 +97,13 @@ func (s *Sqlite) Latest(tags []string) ([]*models.Snippet, error) {
 				stmt += ` OR `
 			}
 			stmt += `category LIKE ?`
+			args = append(args, "%"+tags[i]+"%")
 		}
 		stmt += `)`
 	}
 
 	// Add ordering and limit
 	stmt += ` ORDER BY id DESC LIMIT 10`
-
-	// Prepare arguments for the query
-	args := []interface{}{}
-	for _, tag := range tags {
-		args = append(args, "%"+tag+"%") // Use LIKE to match tags
-	}
 
 	// Execute the query
 	rows, err := s.DB.Query(stmt, args...)
@@ -129,7 +142,6 @@ func (s *Sqlite) Latest(tags []string) ([]*models.Snippet, error) {
 	return snippets, nil
 }
 
-
 func (s *Sqlite) AddComment(postId, userId int, content string) error {
 	op := "sqlite.AddComment"
 	stmt, err := s.DB.Prepare("INSERT INTO comments (post_id, user_id, content) VALUES (?, ?, ?)")
@@ -137,7 +149,7 @@ func (s *Sqlite) AddComment(postId, userId int, content string) error {
 		return fmt.Errorf("%s : %w", op, err)
 	}
 	_, err = stmt.Exec(postId, userId, content)
-	if  err != nil {
+	if err != nil {
 		return err
 	}
 	return nil

@@ -42,8 +42,8 @@ func (s *service) GetSnippet(id int) (*models.Snippet, error) {
 	return s.repo.GetSnippet(id)
 }
 
-func (s *service) Latest(tags []string) ([]*models.Snippet, error) {
-	snippets, err := s.repo.Latest(tags)
+func (s *service) Latest(tags []string, filter string, userID int) ([]*models.Snippet, error) {
+	snippets, err := s.repo.Latest(tags, filter, userID)
 	if err != nil {
 		return nil, err
 	}

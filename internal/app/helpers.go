@@ -9,27 +9,38 @@ import (
 	"time"
 )
 
+func (app *Application) RenderError(w http.ResponseWriter, status int, message string) {
+	data := &models.TemplateData{
+		ErrorCode: status,
+		Message:   message,
+	}
+
+	app.Render(w, status, "error.tmpl", data)
+}
+
 // The serverError helper writes an error message and stack trace to the errorLog,
 // then sends a generic 500 Internal Server Error response to the user.
 func (app *Application) ServerError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
 	app.ErrorLog.Output(2, trace)
 
-	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	// Render the custom error template
+	app.RenderError(w, http.StatusInternalServerError, "An unexpected error occurred. Please try again later.")
 }
 
 // The clientError helper sends a specific status code and corresponding description
 // to the user. We'll use this later in the book to send responses like 400 "Bad
 // Request" when there's a problem with the request that the user sent.
 func (app *Application) ClientError(w http.ResponseWriter, status int) {
-	http.Error(w, http.StatusText(status), status)
+	// Render the custom error template
+	app.RenderError(w, status, http.StatusText(status))
 }
 
 // For consistency, we'll also implement a notFound helper. This is simply a
 // convenience wrapper around clientError which sends a 404 Not Found response to
 // the user.
 func (app *Application) NotFound(w http.ResponseWriter) {
-	app.ClientError(w, http.StatusNotFound)
+	app.RenderError(w, http.StatusNotFound, "Sorry, the page you are looking for does not exist.")
 }
 
 func (app *Application) Render(w http.ResponseWriter, status int, page string, data *models.TemplateData) {

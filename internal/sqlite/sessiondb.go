@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"database/sql"
 	"fmt"
 	"forum/internal/models"
 )
@@ -10,6 +11,10 @@ func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
 	var userID int
 	err := s.DB.QueryRow(stmt, token).Scan(&userID)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			// No such token found, suggest redirecting to login page
+			return -1, fmt.Errorf("token not found, please login again")
+		}
 		return -1, err
 	}
 	return userID, nil
