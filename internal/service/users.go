@@ -45,10 +45,19 @@ func (s *service) Authenticate(username, password string) (*models.Session, int,
 
 func (s *service) GetUser(r *http.Request) (*models.User, error) {
 	token := app.GetSessionCookie("session_id", r)
-	userID, err := s.repo.GetUserIDByToken(token.Value)
-	if err != nil {
-		return nil, err
-	}
+    
+    // If no token exists, return nil
+    if token == nil {
+        return nil, models.ErrNoToken
+    }
+    
+    // Retrieve the user ID associated with the session token
+    userID, err := s.repo.GetUserIDByToken(token.Value)
+    if err != nil {
+        // If the token is invalid or not found
+        return nil, models.ErrInvalidToken
+    }
+	
 	return s.repo.GetUserByID(userID)
 }
 

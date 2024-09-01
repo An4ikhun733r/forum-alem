@@ -62,8 +62,17 @@ func (h *HandlerApp) Home(w http.ResponseWriter, r *http.Request) {
 	if h.IsAuthenticated(r) {
 		user, err := h.service.GetUser(r) // Get the *models.User object
 		if err != nil {
-			http.Redirect(w, r, "/user/login", http.StatusSeeOther)
-			return
+			if err == models.ErrNoToken{
+				http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+                return
+			}	else if err == models.ErrInvalidToken {
+                // If the session is invalid, you might want to log out the user and redirect to login
+                http.Redirect(w, r, "/user/logout", http.StatusSeeOther)
+                return
+			} else {
+                h.ServerError(w, err)
+                return
+			}
 		}
 		userID = user.ID // Extract the user ID from the User object
 	}
